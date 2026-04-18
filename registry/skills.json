@@ -1,0 +1,62 @@
+{
+  "registry_version": "0.1.0",
+  "generated_at": "2026-04-18",
+  "skills": [
+    {
+      "name": "agency-agents-zh-manage",
+      "slug": "agency-agents-zh-manage",
+      "version": "0.1.0",
+      "description": "Manage the agency-agents-zh role library on demand: find, preview, install, remove, and sync selected roles for Codex or OpenClaw without full installation.",
+      "repository": {
+        "full_name": "dengqixing/agency-agents-zh-manage",
+        "default_branch": "main",
+        "url": "https://github.com/dengqixing/agency-agents-zh-manage"
+      },
+      "metadata": {
+        "skill_json": "skill.json",
+        "skill_markdown": "skills/agency-agents-zh-manage/SKILL.md",
+        "agent_manifest": "skills/agency-agents-zh-manage/agents/openai.yaml"
+      },
+      "entry": {
+        "kind": "script",
+        "path": "skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh"
+      },
+      "install": {
+        "mode": "copy_skill_directory",
+        "source": "skills/agency-agents-zh-manage"
+      },
+      "supported_tools": [
+        "codex",
+        "openclaw"
+      ],
+      "capabilities": [
+        "find_roles",
+        "preview_role",
+        "list_installed",
+        "install_role_codex",
+        "install_role_openclaw",
+        "remove_installed_role",
+        "sync_manifest"
+      ],
+      "dependencies": {
+        "requires_local_repo": true,
+        "repo_name": "agency-agents-zh",
+        "repo_resolution_order": [
+          "--repo /path/to/agency-agents-zh",
+          "AGENCY_AGENTS_REPO",
+          "./vendor/agency-agents-zh",
+          "../agency-agents-zh"
+        ]
+      },
+      "license": "MIT",
+      "tags": [
+        "skills",
+        "agents",
+        "roles",
+        "codex",
+        "openclaw",
+        "cli"
+      ]
+    }
+  ]
+}
