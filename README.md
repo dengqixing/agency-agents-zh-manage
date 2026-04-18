@@ -137,6 +137,10 @@
 - 用 manifest 管理团队或个人的稳定角色列表
 - 在 Codex 和 OpenClaw 之间保持一致的角色管理方式
 
+## Contributing
+
+欢迎提交 issue 或 pull request。贡献说明见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
 ## License
 
 [MIT](LICENSE)
@@ -279,6 +283,10 @@ See [agents.txt](agents.txt):
 - avoid installing the full role library into your tool
 - manage a stable role set with a manifest
 - keep a consistent workflow across Codex and OpenClaw
+
+## Contributing
+
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
 ## License
 
