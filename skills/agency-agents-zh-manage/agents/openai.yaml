@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agency Agents Zh Manage"
+  short_description: "Find, install, remove, and sync selected agency-agents-zh roles"
+  default_prompt: "Use agency-agents-zh-manage to find, inspect, install, remove, or sync a small set of roles from agency-agents-zh without full installation."
