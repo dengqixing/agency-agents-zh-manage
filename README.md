@@ -30,7 +30,7 @@ agency list
 
 `agency-agents-zh-manage` 是一个用于**按需管理 `agency-agents-zh` 角色库**的 Agent Skill。
 
-👉 同时也是一个可被 CLI / Agent 自动发现和安装的 Skill 单元。
+👉 同时也是一个 **可被 CLI / Agent 自动发现和安装的 Skill 单元**。
 
 ---
 
@@ -84,9 +84,15 @@ skill.json
 install.sh
 ```
 
+👉 形成完整闭环：
+
+```text
+Skill + Registry + Installer + CLI
+```
+
 ---
 
-## 📥 手动安装
+## 📥 手动安装（备用）
 
 ```bash
 cp -r skills/agency-agents-zh-manage ~/.codex/skills/
@@ -97,6 +103,13 @@ cp -r skills/agency-agents-zh-manage ~/.codex/skills/
 ## ⚠️ 前提
 
 需要本地存在 `agency-agents-zh` 仓库。
+
+解析顺序：
+
+1. `--repo`
+2. 环境变量
+3. vendor
+4. 相对路径
 
 ---
 
@@ -128,7 +141,7 @@ curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/
 
 ---
 
-## CLI Usage
+## 🚀 CLI Usage
 
 ```bash
 agency install agency-agents-zh-manage
@@ -137,20 +150,105 @@ agency list
 
 ---
 
-## Overview
+## 🧩 What is this
 
-A lightweight skill for on-demand management of the role library.
+`agency-agents-zh-manage` is an **agent skill for on-demand management of the `agency-agents-zh` role library**.
+
+👉 It is also a **machine-discoverable and installable skill unit** designed for CLI / agent ecosystems.
 
 ---
 
-## Architecture
+## 🎯 Use Cases
+
+- Avoid installing the full role library
+- Maintain a minimal set of frequently used roles
+- Manage roles via a manifest
+- Reuse roles across Codex and OpenClaw
+- Share role sets within teams
+
+---
+
+## 🧠 Core Capabilities
+
+- Role search
+- Role preview
+- Install roles
+- List installed roles
+- Remove roles
+- Sync via manifest
+
+---
+
+## 📦 Repository Structure
 
 ```text
-CLI → Registry → Skill → Installer
+skills/
+  agency-agents-zh-manage/
+    SKILL.md
+    agents/openai.yaml
+    scripts/agency-agents-zh-manage.sh
+
+install.sh
+agency
+skill.json
+registry/skills.json
 ```
 
 ---
 
-## License
+## 🧠 Architecture
+
+```text
+agency CLI
+   ↓
+registry/skills.json
+   ↓
+skill.json
+   ↓
+install.sh
+```
+
+👉 Full pipeline:
+
+```text
+Skill + Registry + Installer + CLI
+```
+
+---
+
+## 📥 Manual Installation
+
+```bash
+cp -r skills/agency-agents-zh-manage ~/.codex/skills/
+```
+
+---
+
+## ⚠️ Prerequisites
+
+Requires a local `agency-agents-zh` repository.
+
+Resolution order:
+
+1. `--repo`
+2. env var
+3. vendor
+4. relative path
+
+---
+
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+## 📜 Changelog
+
+See [CHANGELOG.md](CHANGELOG.md)
+
+---
+
+## 📄 License
 
 MIT
