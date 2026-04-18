@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -e
+
+REGISTRY_URL="https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/registry/skills.json"
+
+cmd="$1"
+shift || true
+
+case "$cmd" in
+  install)
+    skill="$1"
+    shift || true
+
+    echo "Fetching registry..."
+    json=$(curl -fsSL "$REGISTRY_URL")
+
+    repo=$(echo "$json" | grep -A5 "\"slug\": \"$skill\"" | grep "url" | head -1 | cut -d '"' -f4)
+
+    if [ -z "$repo" ]; then
+      echo "Skill not found: $skill"
+      exit 1
+    fi
+
+    echo "Installing $skill from $repo"
+    curl -fsSL "$repo/raw/main/install.sh" | bash
+    ;;
+
+  list)
+    curl -fsSL "$REGISTRY_URL" | grep '"slug"' | cut -d '"' -f4
+    ;;
+
+  *)
+    echo "Usage: agency install <skill> | agency list"
+    ;;
+esac
