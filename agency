@@ -1,35 +1,281 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-REGISTRY_URL="https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/registry/skills.json"
+REGISTRY_URL_DEFAULT="https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/registry/skills.json"
+STATE_DIR_DEFAULT="${HOME}/.agency"
+INSTALLED_DB_DEFAULT="${STATE_DIR_DEFAULT}/installed.json"
 
-cmd="$1"
-shift || true
+REGISTRY_URL="${AGENCY_REGISTRY_URL:-$REGISTRY_URL_DEFAULT}"
+STATE_DIR="${AGENCY_STATE_DIR:-$STATE_DIR_DEFAULT}"
+INSTALLED_DB="${AGENCY_INSTALLED_DB:-$INSTALLED_DB_DEFAULT}"
 
-case "$cmd" in
-  install)
-    skill="$1"
-    shift || true
+usage() {
+  cat <<'EOF'
+agency CLI v0.1
 
-    echo "Fetching registry..."
-    json=$(curl -fsSL "$REGISTRY_URL")
+Usage:
+  agency list
+  agency install <skill>[@version] [--tool codex|openclaw|auto] [--dest <dir>] [--yes]
+  agency list-installed
+  agency remove <skill>
+  agency upgrade <skill>
 
-    repo=$(echo "$json" | grep -A5 "\"slug\": \"$skill\"" | grep "url" | head -1 | cut -d '"' -f4)
+Environment:
+  AGENCY_REGISTRY_URL   Override registry URL
+  AGENCY_STATE_DIR      Override state directory
+  AGENCY_INSTALLED_DB   Override installed DB path
+EOF
+}
 
-    if [ -z "$repo" ]; then
-      echo "Skill not found: $skill"
-      exit 1
-    fi
+err() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 1
+}
 
-    echo "Installing $skill from $repo"
-    curl -fsSL "$repo/raw/main/install.sh" | bash
-    ;;
+note() {
+  printf '%s\n' "$*" >&2
+}
 
-  list)
-    curl -fsSL "$REGISTRY_URL" | grep '"slug"' | cut -d '"' -f4
-    ;;
+require_cmd() {
+  command -v "$1" >/dev/null 2>&1 || err "Missing command: $1"
+}
 
-  *)
-    echo "Usage: agency install <skill> | agency list"
-    ;;
-esac
+ensure_state() {
+  mkdir -p "$STATE_DIR"
+  if [[ ! -f "$INSTALLED_DB" ]]; then
+    printf '{"installed": []}\n' > "$INSTALLED_DB"
+  fi
+}
+
+fetch_registry() {
+  require_cmd curl
+  require_cmd jq
+  curl -fsSL "$REGISTRY_URL"
+}
+
+parse_skill_ref() {
+  local ref="$1"
+  local name="${ref%%@*}"
+  local version="latest"
+  if [[ "$ref" == *"@"* ]]; then
+    version="${ref##*@}"
+  fi
+  printf '%s\n%s\n' "$name" "$version"
+}
+
+registry_skill_exists() {
+  local json="$1"
+  local slug="$2"
+  jq -e --arg slug "$slug" '.skills[] | select(.slug == $slug)' >/dev/null <<< "$json"
+}
+
+registry_skill_field() {
+  local json="$1"
+  local slug="$2"
+  local expr="$3"
+  jq -r --arg slug "$slug" ".skills[] | select(.slug == \$slug) | ${expr}" <<< "$json"
+}
+
+record_install() {
+  local skill="$1"
+  local version="$2"
+  local tool="$3"
+  local dest="$4"
+  local repo_url="$5"
+
+  ensure_state
+  local tmp
+  tmp="$(mktemp)"
+
+  jq \
+    --arg skill "$skill" \
+    --arg version "$version" \
+    --arg tool "$tool" \
+    --arg dest "$dest" \
+    --arg repo_url "$repo_url" \
+    '
+      .installed = (
+        [.installed[] | select(.skill != $skill)] + [
+          {
+            skill: $skill,
+            version: $version,
+            tool: $tool,
+            dest: $dest,
+            repo_url: $repo_url
+          }
+        ]
+      )
+    ' "$INSTALLED_DB" > "$tmp"
+
+  mv "$tmp" "$INSTALLED_DB"
+}
+
+remove_install_record() {
+  local skill="$1"
+  ensure_state
+  local tmp
+  tmp="$(mktemp)"
+  jq --arg skill "$skill" '.installed = [.installed[] | select(.skill != $skill)]' "$INSTALLED_DB" > "$tmp"
+  mv "$tmp" "$INSTALLED_DB"
+}
+
+get_install_record() {
+  local skill="$1"
+  ensure_state
+  jq -r --arg skill "$skill" '.installed[] | select(.skill == $skill) | @base64' "$INSTALLED_DB" | head -1
+}
+
+decode_record_field() {
+  local record="$1"
+  local field="$2"
+  printf '%s' "$record" | base64 --decode | jq -r ".${field}"
+}
+
+cmd_list() {
+  local json
+  json="$(fetch_registry)"
+  jq -r '.skills[] | "\(.slug)\t\(.version)\t\(.description)"' <<< "$json"
+}
+
+cmd_install() {
+  local ref="$1"
+  shift || true
+
+  local tool="auto"
+  local dest=""
+  local yes_flag="0"
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --tool)
+        tool="${2:?--tool requires a value}"
+        shift 2
+        ;;
+      --dest)
+        dest="${2:?--dest requires a value}"
+        shift 2
+        ;;
+      --yes)
+        yes_flag="1"
+        shift
+        ;;
+      *)
+        err "Unknown argument: $1"
+        ;;
+    esac
+  done
+
+  local parsed skill version json repo_url install_url
+  parsed="$(parse_skill_ref "$ref")"
+  skill="$(printf '%s\n' "$parsed" | sed -n '1p')"
+  version="$(printf '%s\n' "$parsed" | sed -n '2p')"
+
+  json="$(fetch_registry)"
+  registry_skill_exists "$json" "$skill" || err "Skill not found: $skill"
+
+  repo_url="$(registry_skill_field "$json" "$skill" '.repository.url')"
+  [[ -n "$repo_url" && "$repo_url" != "null" ]] || err "Missing repository URL for $skill"
+
+  install_url="${repo_url}/raw/main/install.sh"
+  note "Installing ${skill} (${version}) from ${repo_url}"
+
+  local args=()
+  [[ "$tool" != "auto" ]] && args+=(--tool "$tool")
+  [[ -n "$dest" ]] && args+=(--dest "$dest")
+  [[ "$yes_flag" == "1" ]] && args+=(--yes)
+
+  curl -fsSL "$install_url" | bash -s -- "${args[@]}"
+
+  local recorded_dest="$dest"
+  if [[ -z "$recorded_dest" ]]; then
+    case "$tool" in
+      codex) recorded_dest="${HOME}/.codex/skills/${skill}" ;;
+      openclaw) recorded_dest="${HOME}/.openclaw/skills/${skill}" ;;
+      auto) recorded_dest="auto" ;;
+    esac
+  fi
+
+  record_install "$skill" "$version" "$tool" "$recorded_dest" "$repo_url"
+  printf 'Installed and recorded: %s\n' "$skill"
+}
+
+cmd_list_installed() {
+  ensure_state
+  jq -r '.installed[] | "\(.skill)\t\(.version)\t\(.tool)\t\(.dest)"' "$INSTALLED_DB"
+}
+
+cmd_remove() {
+  local skill="$1"
+  local record
+  record="$(get_install_record "$skill")"
+  [[ -n "$record" ]] || err "Skill is not recorded as installed: $skill"
+
+  local dest
+  dest="$(decode_record_field "$record" 'dest')"
+  if [[ -n "$dest" && "$dest" != "auto" && -e "$dest" ]]; then
+    rm -rf "$dest"
+    note "Removed installed files: $dest"
+  else
+    note "No concrete install path recorded, only removing local record."
+  fi
+
+  remove_install_record "$skill"
+  printf 'Removed: %s\n' "$skill"
+}
+
+cmd_upgrade() {
+  local skill="$1"
+  local record
+  record="$(get_install_record "$skill")"
+  [[ -n "$record" ]] || err "Skill is not recorded as installed: $skill"
+
+  local tool dest
+  tool="$(decode_record_field "$record" 'tool')"
+  dest="$(decode_record_field "$record" 'dest')"
+
+  local args=("$skill")
+  [[ "$tool" != "auto" ]] && args+=(--tool "$tool")
+  [[ -n "$dest" && "$dest" != "auto" ]] && args+=(--dest "$dest")
+  args+=(--yes)
+
+  cmd_install "${args[@]}"
+  printf 'Upgraded: %s\n' "$skill"
+}
+
+main() {
+  local cmd="${1:-}"
+  [[ -n "$cmd" ]] || {
+    usage
+    exit 1
+  }
+  shift || true
+
+  case "$cmd" in
+    list)
+      cmd_list
+      ;;
+    install)
+      [[ $# -ge 1 ]] || err "Usage: agency install <skill>[@version]"
+      cmd_install "$@"
+      ;;
+    list-installed)
+      cmd_list_installed
+      ;;
+    remove)
+      [[ $# -eq 1 ]] || err "Usage: agency remove <skill>"
+      cmd_remove "$1"
+      ;;
+    upgrade)
+      [[ $# -eq 1 ]] || err "Usage: agency upgrade <skill>"
+      cmd_upgrade "$1"
+      ;;
+    -h|--help|help)
+      usage
+      ;;
+    *)
+      err "Unknown command: $cmd"
+      ;;
+  esac
+}
+
+main "$@"
