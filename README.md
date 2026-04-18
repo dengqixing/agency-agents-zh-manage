@@ -141,6 +141,10 @@
 
 欢迎提交 issue 或 pull request。贡献说明见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
+## Changelog
+
+变更记录见 [CHANGELOG.md](CHANGELOG.md)。
+
 ## License
 
 [MIT](LICENSE)
@@ -287,6 +291,10 @@ See [agents.txt](agents.txt):
 ## Contributing
 
 Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for notable project changes.
 
 ## License
 
