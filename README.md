@@ -1,5 +1,10 @@
 # agency-agents-zh-manage
 
+![License](https://img.shields.io/badge/license-MIT-green)
+![Type](https://img.shields.io/badge/type-agent--skill-blue)
+![CLI](https://img.shields.io/badge/interface-CLI-orange)
+![Registry](https://img.shields.io/badge/registry-enabled-purple)
+
 中文 | [English](#english)
 
 `agency-agents-zh-manage` 是一个用于**按需管理 `agency-agents-zh` 角色库**的 Skill。
