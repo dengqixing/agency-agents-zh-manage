@@ -2,18 +2,27 @@
 
 中文 | [English](#english)
 
-`agency-agents-zh-manage` 是一个用于按需管理 `agency-agents-zh` 角色库的 Skill。
+`agency-agents-zh-manage` 是一个用于**按需管理 `agency-agents-zh` 角色库**的 Skill。
 
-它的目标不是全量安装角色，而是让你只在需要时执行这些动作：
+它适合这样的场景：
+
+- 你不想把整个 `agency-agents-zh` 角色库一次性装进工具
+- 你只想维护一小组常用角色
+- 你希望通过清单（manifest）稳定管理角色集合
+- 你需要同时兼容 Codex 和 OpenClaw
+
+这个 Skill 主要提供以下能力：
 
 - 搜索角色
-- 预览角色原文
-- 安装少量高频角色到 Codex 或 OpenClaw
+- 预览角色内容
+- 安装单个角色到 Codex 或 OpenClaw
 - 列出已安装角色
 - 删除已安装角色
-- 按清单同步常用角色
+- 按 manifest 同步常用角色
 
-这个仓库现在是一个可独立分发的 Skill 仓库，核心内容在：
+## 仓库内容
+
+核心文件：
 
 - [skills/agency-agents-zh-manage/SKILL.md](skills/agency-agents-zh-manage/SKILL.md)
 - [skills/agency-agents-zh-manage/agents/openai.yaml](skills/agency-agents-zh-manage/agents/openai.yaml)
@@ -21,38 +30,21 @@
 
 ## 快速开始
 
-1. 准备 `agency-agents-zh` 角色库本地路径。
-2. 把整个 [skills/agency-agents-zh-manage](skills/agency-agents-zh-manage) 目录复制到目标 agent 的 skills 目录。
-3. 运行：
+1. 准备本地 `agency-agents-zh` 角色库
+2. 把 [skills/agency-agents-zh-manage](skills/agency-agents-zh-manage) 复制到目标 agent 的 skills 目录
+3. 运行帮助命令确认脚本可用
 
 ```bash
 ./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh --help
 ```
 
-常见第一步：
+常见起步命令：
 
 ```bash
 ./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh find "前端" --repo "/path/to/agency-agents-zh"
 ./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh list-installed
-./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh pick "前端" --repo "/path/to/agency-agents-zh"
+./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh codex-install "代码审查" --repo "/path/to/agency-agents-zh"
 ```
-
-## 特性
-
-- 按关键词查找角色
-- 查看最佳匹配角色原文
-- 单角色安装到 Codex
-- 单角色安装到 OpenClaw
-- 列出已安装角色
-- 删除已安装角色
-- 按 manifest 批量同步常用角色
-
-## 适用场景
-
-- 你不想把 `agency-agents-zh` 里所有角色都装进工具
-- 你只想保留少量高频角色
-- 你需要用 manifest 管理一组稳定角色
-- 你需要同时兼容 Codex 和 OpenClaw
 
 ## 安装
 
@@ -76,14 +68,17 @@
 ~/.openclaw/skills/agency-agents-zh-manage/
 ```
 
-## 前提
+## 前提与路径解析
 
-你需要本地有 `agency-agents-zh` 素材库，脚本会按以下顺序查找：
+本仓库**不包含** `agency-agents-zh` 角色库本体。
+你需要在本地准备好该角色库，脚本会按以下顺序解析仓库路径：
 
 1. `--repo "/path/to/agency-agents-zh"`
 2. `AGENCY_AGENTS_REPO`
 3. `./vendor/agency-agents-zh`
 4. `../agency-agents-zh`
+
+推荐优先使用 `--repo` 或环境变量，以减少对本地目录结构的依赖。
 
 ## 用法
 
@@ -135,26 +130,42 @@
 小红书运营专家
 ```
 
-## 发布建议
+## 适用场景
 
-- 发布前确认 `gh auth status` 正常
-- 发布前确认仓库中没有 `.DS_Store`
-- 如果要公开发布，优先保证 skill 自包含，不依赖个人本机路径
+- 用最小安装集合维护常用角色
+- 避免把完整角色库全部装入工具
+- 用 manifest 管理团队或个人的稳定角色列表
+- 在 Codex 和 OpenClaw 之间保持一致的角色管理方式
+
+## License
+
+[MIT](LICENSE)
+
+---
 
 ## English
 
 `agency-agents-zh-manage` is a skill for managing the `agency-agents-zh` role library on demand.
 
-It is not designed for full installation. Instead, it helps you:
+It is designed for users who:
+
+- do not want to install the full `agency-agents-zh` role library
+- only want to keep a small set of frequently used roles
+- want to manage a stable role set with a manifest
+- need compatibility with both Codex and OpenClaw
+
+Main capabilities:
 
 - search roles
 - preview role content
-- install a small set of high-frequency roles into Codex or OpenClaw
+- install a single role into Codex or OpenClaw
 - list installed roles
 - remove installed roles
-- sync a manifest of common roles
+- sync common roles from a manifest
 
-This repository is now a self-contained distributable skill repository. Core files:
+## Repository Contents
+
+Core files:
 
 - [skills/agency-agents-zh-manage/SKILL.md](skills/agency-agents-zh-manage/SKILL.md)
 - [skills/agency-agents-zh-manage/agents/openai.yaml](skills/agency-agents-zh-manage/agents/openai.yaml)
@@ -162,38 +173,21 @@ This repository is now a self-contained distributable skill repository. Core fil
 
 ## Quick Start
 
-1. Prepare a local copy of the `agency-agents-zh` role library.
-2. Copy [skills/agency-agents-zh-manage](skills/agency-agents-zh-manage) into your target agent's skills directory.
-3. Run:
+1. Prepare a local copy of `agency-agents-zh`
+2. Copy [skills/agency-agents-zh-manage](skills/agency-agents-zh-manage) into your target agent's skills directory
+3. Run the help command to verify the script works
 
 ```bash
 ./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh --help
 ```
 
-Typical first commands:
+Typical starting commands:
 
 ```bash
 ./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh find "frontend" --repo "/path/to/agency-agents-zh"
 ./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh list-installed
-./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh pick "frontend" --repo "/path/to/agency-agents-zh"
+./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh codex-install "code review" --repo "/path/to/agency-agents-zh"
 ```
-
-## Features
-
-- search roles by keyword
-- preview the best-matched role content
-- install a single role into Codex
-- install a single role into OpenClaw
-- list installed roles
-- remove installed roles
-- sync a manifest of common roles
-
-## Best Fit
-
-- you do not want to install all roles from `agency-agents-zh`
-- you only want to keep a small high-frequency set
-- you want to manage a stable role set with a manifest
-- you need compatibility with both Codex and OpenClaw
 
 ## Installation
 
@@ -217,14 +211,17 @@ Copy to:
 ~/.openclaw/skills/agency-agents-zh-manage/
 ```
 
-## Prerequisite
+## Prerequisites and Repository Resolution
 
-You need a local copy of `agency-agents-zh`. The script resolves it in this order:
+This repository does **not** include the `agency-agents-zh` role library itself.
+You need a local copy of that repository. The script resolves it in the following order:
 
 1. `--repo "/path/to/agency-agents-zh"`
 2. `AGENCY_AGENTS_REPO`
 3. `./vendor/agency-agents-zh`
 4. `../agency-agents-zh`
+
+Using `--repo` or the environment variable is recommended to avoid depending on a specific local directory layout.
 
 ## Usage
 
@@ -263,3 +260,26 @@ Sync from a manifest:
 ```bash
 ./skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh sync --tool codex --manifest "./agents.txt" --repo "/path/to/agency-agents-zh"
 ```
+
+## Example Manifest
+
+See [agents.txt](agents.txt):
+
+```text
+# one keyword or slug per line
+前端开发者
+代码审查
+安全工程师
+小红书运营专家
+```
+
+## Best Fit
+
+- maintain a minimal set of frequently used roles
+- avoid installing the full role library into your tool
+- manage a stable role set with a manifest
+- keep a consistent workflow across Codex and OpenClaw
+
+## License
+
+[MIT](LICENSE)
