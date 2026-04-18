@@ -22,6 +22,9 @@ curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/
 ```bash
 agency install agency-agents-zh-manage
 agency list
+agency list-installed
+agency remove agency-agents-zh-manage
+agency upgrade agency-agents-zh-manage
 ```
 
 ---
@@ -84,7 +87,7 @@ skill.json
 install.sh
 ```
 
-👉 形成完整闭环：
+👉 完整闭环：
 
 ```text
 Skill + Registry + Installer + CLI
@@ -146,6 +149,9 @@ curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/
 ```bash
 agency install agency-agents-zh-manage
 agency list
+agency list-installed
+agency remove agency-agents-zh-manage
+agency upgrade agency-agents-zh-manage
 ```
 
 ---
