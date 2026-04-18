@@ -13,9 +13,9 @@
 
 这个仓库现在是一个**可独立分发的 Skill 仓库**，核心内容在：
 
-- [skills/agency-agents-zh-manage/SKILL.md](/Users/dddeng/deng/codex/skills/agency-agents-zh-manage/SKILL.md)
-- [skills/agency-agents-zh-manage/agents/openai.yaml](/Users/dddeng/deng/codex/skills/agency-agents-zh-manage/agents/openai.yaml)
-- [skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh](/Users/dddeng/deng/codex/skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh)
+- [skills/agency-agents-zh-manage/SKILL.md](skills/agency-agents-zh-manage/SKILL.md)
+- [skills/agency-agents-zh-manage/agents/openai.yaml](skills/agency-agents-zh-manage/agents/openai.yaml)
+- [skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh](skills/agency-agents-zh-manage/scripts/agency-agents-zh-manage.sh)
 
 ## 特性
 
@@ -38,7 +38,7 @@
 
 ### 通用 Skill 目录
 
-把整个 [skills/agency-agents-zh-manage](/Users/dddeng/deng/codex/skills/agency-agents-zh-manage) 目录复制到目标 agent 的 skills 目录。
+把整个 [skills/agency-agents-zh-manage](skills/agency-agents-zh-manage) 目录复制到目标 agent 的 skills 目录。
 
 ### Codex
 
@@ -105,7 +105,7 @@
 
 ## 示例清单
 
-见 [agents.txt](/Users/dddeng/deng/codex/agents.txt)：
+见 [agents.txt](agents.txt)：
 
 ```text
 # 每行一个关键词或 slug
