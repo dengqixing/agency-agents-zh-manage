@@ -3,132 +3,196 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Type](https://img.shields.io/badge/type-agent--skill-blue)
 ![CLI](https://img.shields.io/badge/interface-CLI-orange)
-![Registry](https://img.shields.io/badge/registry-enabled-purple)
+![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-blue)
 
 中文 | [English](#english)
 
 ---
 
-## ⚡ 一条命令安装（推荐）
+## 中文
+
+### 是什么
+
+`agency-agents-zh-manage` 是一个按需管理 [`agency-agents-zh`](https://github.com/jnMetaCode/agency-agents-zh) 角色库的 skill。
+
+它的目标是：
+
+- 不必全量安装角色库
+- 只安装你常用的角色到 Codex 或 OpenClaw
+- 通过 `find / show / pick / sync` 做轻量管理
+- 现在支持更完整的 `macOS` 与 `Windows` 工作流
+
+---
+
+### 现在支持什么
+
+- macOS / Linux 下可直接使用 `install.sh`
+- Windows 下提供 `install.ps1` 和 `.cmd` 入口
+- 自动安装或更新前置依赖仓库 `agency-agents-zh`
+- 主脚本内置 `repo-install` / `repo-update` / `doctor`
+- 修复角色 frontmatter 解析，避免“仓库明明在，但搜不到角色”
+
+---
+
+### 快速安装
+
+#### macOS / Linux
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.sh | bash
 ```
 
----
-
-## 🚀 CLI 使用（核心入口）
+安装到 Codex：
 
 ```bash
-agency install agency-agents-zh-manage
+curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.sh | bash -s -- --tool codex
+```
+
+安装并更新依赖仓库：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.sh | bash -s -- --tool codex --update-role-repo
+```
+
+#### Windows PowerShell
+
+先下载再运行：
+
+```powershell
+Invoke-WebRequest https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.ps1 -OutFile install.ps1
+.\install.ps1 -Tool codex
+```
+
+安装并更新依赖仓库：
+
+```powershell
+.\install.ps1 -Tool codex -UpdateRoleRepo
+```
+
+安装完成后，Windows 会自动写入：
+
+- `AGENCY_AGENTS_REPO`
+- `AGENCY_AGENTS_ZH_MANAGE_SCRIPT`
+
+这样 Codex 后续会优先使用 `.cmd` 入口。
+
+---
+
+### CLI 用法
+
+如果你在用仓库根目录的 CLI：
+
+```bash
 agency list
+agency install agency-agents-zh-manage
 agency list-installed
-agency remove agency-agents-zh-manage
 agency upgrade agency-agents-zh-manage
+agency remove agency-agents-zh-manage
+```
+
+Windows 可用：
+
+```bat
+agency.cmd list
+agency.cmd install agency-agents-zh-manage
 ```
 
 ---
 
-## 🧩 是什么
+### Skill 常用命令
 
-`agency-agents-zh-manage` 是一个用于**按需管理 `agency-agents-zh` 角色库**的 Agent Skill。
+查看帮助：
 
-👉 同时也是一个 **可被 CLI / Agent 自动发现和安装的 Skill 单元**。
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" --help
+```
+
+Windows：
+
+```bat
+agency-agents-zh-manage.cmd --help
+```
+
+安装依赖仓库：
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" repo-install
+```
+
+更新依赖仓库：
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" repo-update
+```
+
+环境检查：
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" doctor
+```
+
+搜索角色：
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" find "software-architect"
+```
+
+安装到 Codex：
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" codex-install "software-architect" --scope user
+```
+
+同步 manifest：
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" sync --tool codex --manifest "./agents.txt" --scope user
+```
 
 ---
 
-## 🎯 适用场景
+### 依赖仓库位置
 
-- 不想安装完整角色库
-- 只使用少量高频角色
-- 使用 manifest 管理角色集合
-- 跨 Codex / OpenClaw 复用能力
-- 团队共享角色体系
+默认会优先在以下位置查找 `agency-agents-zh`：
+
+1. `--repo`
+2. `AGENCY_AGENTS_REPO`
+3. `./vendor/agency-agents-zh`
+4. `../agency-agents-zh`
+5. `~/.agency/vendor/agency-agents-zh`
+6. `~/.codex/vendor/agency-agents-zh`
+7. `~/.openclaw/vendor/agency-agents-zh`
+
+默认安装器会把依赖仓库放到：
+
+```text
+~/.agency/vendor/agency-agents-zh
+```
 
 ---
 
-## 🧠 核心能力
-
-- 搜索角色（find）
-- 预览角色（show / pick）
-- 安装角色（codex / openclaw）
-- 查看已安装角色
-- 删除角色
-- manifest 同步（sync）
-
----
-
-## 📦 仓库结构
+### 仓库结构
 
 ```text
 skills/
   agency-agents-zh-manage/
     SKILL.md
     agents/openai.yaml
-    scripts/agency-agents-zh-manage.sh
+    scripts/
+      agency-agents-zh-manage.sh
+      agency-agents-zh-manage.cmd
 
-install.sh
 agency
-skill.json
-registry/skills.json
-```
-
----
-
-## 🧠 架构
-
-```text
-agency CLI
-   ↓
-registry/skills.json
-   ↓
-skill.json
-   ↓
+agency.cmd
 install.sh
-```
-
-👉 完整闭环：
-
-```text
-Skill + Registry + Installer + CLI
+install.ps1
+skill.json
+registry/skills.json
 ```
 
 ---
 
-## 📥 手动安装（备用）
-
-```bash
-cp -r skills/agency-agents-zh-manage ~/.codex/skills/
-```
-
----
-
-## ⚠️ 前提
-
-需要本地存在 `agency-agents-zh` 仓库。
-
-解析顺序：
-
-1. `--repo`
-2. 环境变量
-3. vendor
-4. 相对路径
-
----
-
-## 🤝 Contributing
-
-👉 [CONTRIBUTING.md](CONTRIBUTING.md)
-
----
-
-## 📜 Changelog
-
-👉 [CHANGELOG.md](CHANGELOG.md)
-
----
-
-## 📄 License
+### License
 
 MIT
 
@@ -136,125 +200,185 @@ MIT
 
 # English
 
-## ⚡ One-line install
+### What This Is
+
+`agency-agents-zh-manage` is a skill for managing the [`agency-agents-zh`](https://github.com/jnMetaCode/agency-agents-zh) role library on demand.
+
+It is designed for teams or individuals who want to:
+
+- avoid installing the full role library
+- install only selected roles into Codex or OpenClaw
+- manage role discovery with `find / show / pick / sync`
+- use the project on both `macOS` and `Windows`
+
+---
+
+### What Changed
+
+- first-class `macOS` / `Linux` install flow via `install.sh`
+- first-class `Windows` install flow via `install.ps1` and `.cmd` launchers
+- automatic install or update of the `agency-agents-zh` dependency repository
+- new `repo-install`, `repo-update`, and `doctor` commands
+- fixed role frontmatter parsing so valid roles can be discovered reliably
+
+---
+
+### Quick Install
+
+#### macOS / Linux
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.sh | bash
 ```
 
----
-
-## 🚀 CLI Usage
+Install for Codex:
 
 ```bash
-agency install agency-agents-zh-manage
+curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.sh | bash -s -- --tool codex
+```
+
+Install and refresh the dependency repo:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.sh | bash -s -- --tool codex --update-role-repo
+```
+
+#### Windows PowerShell
+
+```powershell
+Invoke-WebRequest https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.ps1 -OutFile install.ps1
+.\install.ps1 -Tool codex
+```
+
+Install and refresh the dependency repo:
+
+```powershell
+.\install.ps1 -Tool codex -UpdateRoleRepo
+```
+
+The Windows installer persists:
+
+- `AGENCY_AGENTS_REPO`
+- `AGENCY_AGENTS_ZH_MANAGE_SCRIPT`
+
+This lets Codex prefer the `.cmd` launcher in later sessions.
+
+---
+
+### CLI Usage
+
+Repository-level CLI:
+
+```bash
 agency list
+agency install agency-agents-zh-manage
 agency list-installed
-agency remove agency-agents-zh-manage
 agency upgrade agency-agents-zh-manage
+agency remove agency-agents-zh-manage
+```
+
+Windows:
+
+```bat
+agency.cmd list
+agency.cmd install agency-agents-zh-manage
 ```
 
 ---
 
-## 🧩 What is this
+### Skill Commands
 
-`agency-agents-zh-manage` is an **agent skill for on-demand management of the `agency-agents-zh` role library**.
+Show help:
 
-👉 It is also a **machine-discoverable and installable skill unit** designed for CLI / agent ecosystems.
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" --help
+```
+
+Windows:
+
+```bat
+agency-agents-zh-manage.cmd --help
+```
+
+Install the dependency repo:
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" repo-install
+```
+
+Update the dependency repo:
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" repo-update
+```
+
+Run environment diagnostics:
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" doctor
+```
+
+Find a role:
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" find "software-architect"
+```
+
+Install a role into Codex:
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" codex-install "software-architect" --scope user
+```
+
+Sync a manifest:
+
+```bash
+"$SKILL_DIR/scripts/agency-agents-zh-manage.sh" sync --tool codex --manifest "./agents.txt" --scope user
+```
 
 ---
 
-## 🎯 Use Cases
+### Dependency Repo Resolution
 
-- Avoid installing the full role library
-- Maintain a minimal set of frequently used roles
-- Manage roles via a manifest
-- Reuse roles across Codex and OpenClaw
-- Share role sets within teams
+The script resolves `agency-agents-zh` in this order:
+
+1. `--repo`
+2. `AGENCY_AGENTS_REPO`
+3. `./vendor/agency-agents-zh`
+4. `../agency-agents-zh`
+5. `~/.agency/vendor/agency-agents-zh`
+6. `~/.codex/vendor/agency-agents-zh`
+7. `~/.openclaw/vendor/agency-agents-zh`
+
+The default installer destination is:
+
+```text
+~/.agency/vendor/agency-agents-zh
+```
 
 ---
 
-## 🧠 Core Capabilities
-
-- Role search
-- Role preview
-- Install roles
-- List installed roles
-- Remove roles
-- Sync via manifest
-
----
-
-## 📦 Repository Structure
+### Repository Layout
 
 ```text
 skills/
   agency-agents-zh-manage/
     SKILL.md
     agents/openai.yaml
-    scripts/agency-agents-zh-manage.sh
+    scripts/
+      agency-agents-zh-manage.sh
+      agency-agents-zh-manage.cmd
 
-install.sh
 agency
-skill.json
-registry/skills.json
-```
-
----
-
-## 🧠 Architecture
-
-```text
-agency CLI
-   ↓
-registry/skills.json
-   ↓
-skill.json
-   ↓
+agency.cmd
 install.sh
-```
-
-👉 Full pipeline:
-
-```text
-Skill + Registry + Installer + CLI
+install.ps1
+skill.json
+registry/skills.json
 ```
 
 ---
 
-## 📥 Manual Installation
-
-```bash
-cp -r skills/agency-agents-zh-manage ~/.codex/skills/
-```
-
----
-
-## ⚠️ Prerequisites
-
-Requires a local `agency-agents-zh` repository.
-
-Resolution order:
-
-1. `--repo`
-2. env var
-3. vendor
-4. relative path
-
----
-
-## 🤝 Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md)
-
----
-
-## 📜 Changelog
-
-See [CHANGELOG.md](CHANGELOG.md)
-
----
-
-## 📄 License
+### License
 
 MIT

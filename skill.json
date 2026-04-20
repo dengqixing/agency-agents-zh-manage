@@ -2,7 +2,7 @@
   "name": "agency-agents-zh-manage",
   "slug": "agency-agents-zh-manage",
   "version": "0.1.0",
-  "description": "Manage the agency-agents-zh role library on demand: find, preview, install, remove, and sync selected roles for Codex or OpenClaw without full installation.",
+  "description": "Manage the agency-agents-zh role library on demand across macOS and Windows: find, preview, install, remove, sync, and maintain the dependency repo for Codex or OpenClaw.",
   "type": "skill",
   "entry": {
     "kind": "script",
@@ -24,7 +24,10 @@
     "install_role_codex",
     "install_role_openclaw",
     "remove_installed_role",
-    "sync_manifest"
+    "sync_manifest",
+    "install_dependency_repo",
+    "update_dependency_repo",
+    "doctor_environment"
   ],
   "install": {
     "mode": "copy_skill_directory",
@@ -37,7 +40,10 @@
       "--repo /path/to/agency-agents-zh",
       "AGENCY_AGENTS_REPO",
       "./vendor/agency-agents-zh",
-      "../agency-agents-zh"
+      "../agency-agents-zh",
+      "~/.agency/vendor/agency-agents-zh",
+      "~/.codex/vendor/agency-agents-zh",
+      "~/.openclaw/vendor/agency-agents-zh"
     ]
   },
   "tags": [

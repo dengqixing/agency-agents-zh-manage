@@ -40,6 +40,18 @@ require_cmd() {
   command -v "$1" >/dev/null 2>&1 || err "Missing command: $1"
 }
 
+base64_decode() {
+  if printf '' | base64 --decode >/dev/null 2>&1; then
+    base64 --decode
+  elif printf '' | base64 -d >/dev/null 2>&1; then
+    base64 -d
+  elif printf '' | base64 -D >/dev/null 2>&1; then
+    base64 -D
+  else
+    err "No compatible base64 decode flag was found"
+  fi
+}
+
 ensure_state() {
   mkdir -p "$STATE_DIR"
   if [[ ! -f "$INSTALLED_DB" ]]; then
@@ -128,7 +140,7 @@ get_install_record() {
 decode_record_field() {
   local record="$1"
   local field="$2"
-  printf '%s' "$record" | base64 --decode | jq -r ".${field}"
+  printf '%s' "$record" | base64_decode | jq -r ".${field}"
 }
 
 cmd_list() {
@@ -165,7 +177,7 @@ cmd_install() {
     esac
   done
 
-  local parsed skill version json repo_url install_url
+  local parsed skill version json repo_url install_url repo_path
   parsed="$(parse_skill_ref "$ref")"
   skill="$(printf '%s\n' "$parsed" | sed -n '1p')"
   version="$(printf '%s\n' "$parsed" | sed -n '2p')"
@@ -176,7 +188,8 @@ cmd_install() {
   repo_url="$(registry_skill_field "$json" "$skill" '.repository.url')"
   [[ -n "$repo_url" && "$repo_url" != "null" ]] || err "Missing repository URL for $skill"
 
-  install_url="${repo_url}/raw/main/install.sh"
+  repo_path="${repo_url#https://github.com/}"
+  install_url="https://raw.githubusercontent.com/${repo_path}/main/install.sh"
   note "Installing ${skill} (${version}) from ${repo_url}"
 
   local args=()
