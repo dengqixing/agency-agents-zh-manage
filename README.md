@@ -11,26 +11,42 @@
 
 ## 中文
 
-### 是什么
+### 项目简介
 
-`agency-agents-zh-manage` 是一个按需管理 [`agency-agents-zh`](https://github.com/jnMetaCode/agency-agents-zh) 角色库的 skill。
+`agency-agents-zh-manage` 是一个用于按需管理 [`agency-agents-zh`](https://github.com/jnMetaCode/agency-agents-zh) 角色库的 skill。
 
-它的目标是：
+它适合这些场景：
 
-- 不必全量安装角色库
-- 只安装你常用的角色到 Codex 或 OpenClaw
-- 通过 `find / show / pick / sync` 做轻量管理
-- 现在支持更完整的 `macOS` 与 `Windows` 工作流
+- 不想全量安装整个角色库
+- 只想把少量常用角色安装到 Codex 或 OpenClaw
+- 想用 `find / show / pick / sync` 做轻量管理
+- 需要兼顾 `macOS` 和 `Windows` 的使用环境
 
 ---
 
-### 现在支持什么
+### 当前能力
 
-- macOS / Linux 下可直接使用 `install.sh`
-- Windows 下提供 `install.ps1` 和 `.cmd` 入口
-- 自动安装或更新前置依赖仓库 `agency-agents-zh`
-- 主脚本内置 `repo-install` / `repo-update` / `doctor`
-- 修复角色 frontmatter 解析，避免“仓库明明在，但搜不到角色”
+- 提供 `macOS / Linux` 安装入口 `install.sh`
+- 提供 `Windows` 安装入口 `install.ps1`
+- 提供 `Windows` 命令包装入口 `.cmd`
+- 支持安装或更新依赖仓库 `agency-agents-zh`
+- 提供 `repo-install`、`repo-update`、`doctor`
+- 支持角色搜索、预览、导出、安装、删除、清单同步
+
+---
+
+### Changelog
+
+当前版本：`v0.2.0`
+
+最新版本摘要：
+
+- 新增 Windows 安装器 `install.ps1` 和 `.cmd` 入口
+- 新增 `repo-install`、`repo-update`、`doctor`
+- 新增依赖仓库 `agency-agents-zh` 的安装和更新流程
+- 修复角色 frontmatter 解析与跨平台启动问题
+
+完整变更请见 [CHANGELOG.md](./CHANGELOG.md)。
 
 ---
 
@@ -56,8 +72,6 @@ curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/
 
 #### Windows PowerShell
 
-先下载再运行：
-
 ```powershell
 Invoke-WebRequest https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.ps1 -OutFile install.ps1
 .\install.ps1 -Tool codex
@@ -69,18 +83,18 @@ Invoke-WebRequest https://raw.githubusercontent.com/dengqixing/agency-agents-zh-
 .\install.ps1 -Tool codex -UpdateRoleRepo
 ```
 
-安装完成后，Windows 会自动写入：
+安装完成后，Windows 安装器会写入：
 
 - `AGENCY_AGENTS_REPO`
 - `AGENCY_AGENTS_ZH_MANAGE_SCRIPT`
 
-这样 Codex 后续会优先使用 `.cmd` 入口。
+这样后续 Codex 会优先使用 `.cmd` 包装入口。
 
 ---
 
 ### CLI 用法
 
-如果你在用仓库根目录的 CLI：
+仓库级 CLI：
 
 ```bash
 agency list
@@ -90,7 +104,7 @@ agency upgrade agency-agents-zh-manage
 agency remove agency-agents-zh-manage
 ```
 
-Windows 可用：
+Windows：
 
 ```bat
 agency.cmd list
@@ -99,7 +113,7 @@ agency.cmd install agency-agents-zh-manage
 
 ---
 
-### Skill 常用命令
+### Skill 命令
 
 查看帮助：
 
@@ -143,7 +157,7 @@ agency-agents-zh-manage.cmd --help
 "$SKILL_DIR/scripts/agency-agents-zh-manage.sh" codex-install "software-architect" --scope user
 ```
 
-同步 manifest：
+按清单同步：
 
 ```bash
 "$SKILL_DIR/scripts/agency-agents-zh-manage.sh" sync --tool codex --manifest "./agents.txt" --scope user
@@ -151,9 +165,9 @@ agency-agents-zh-manage.cmd --help
 
 ---
 
-### 依赖仓库位置
+### 依赖仓库解析顺序
 
-默认会优先在以下位置查找 `agency-agents-zh`：
+脚本会按以下顺序查找 `agency-agents-zh`：
 
 1. `--repo`
 2. `AGENCY_AGENTS_REPO`
@@ -163,7 +177,7 @@ agency-agents-zh-manage.cmd --help
 6. `~/.codex/vendor/agency-agents-zh`
 7. `~/.openclaw/vendor/agency-agents-zh`
 
-默认安装器会把依赖仓库放到：
+默认安装位置：
 
 ```text
 ~/.agency/vendor/agency-agents-zh
@@ -200,26 +214,42 @@ MIT
 
 # English
 
-### What This Is
+### Overview
 
 `agency-agents-zh-manage` is a skill for managing the [`agency-agents-zh`](https://github.com/jnMetaCode/agency-agents-zh) role library on demand.
 
-It is designed for teams or individuals who want to:
+It is a good fit when you want to:
 
 - avoid installing the full role library
-- install only selected roles into Codex or OpenClaw
-- manage role discovery with `find / show / pick / sync`
-- use the project on both `macOS` and `Windows`
+- install only a small set of roles into Codex or OpenClaw
+- manage roles through `find / show / pick / sync`
+- support both `macOS` and `Windows`
 
 ---
 
-### What Changed
+### Current Capabilities
 
-- first-class `macOS` / `Linux` install flow via `install.sh`
-- first-class `Windows` install flow via `install.ps1` and `.cmd` launchers
-- automatic install or update of the `agency-agents-zh` dependency repository
-- new `repo-install`, `repo-update`, and `doctor` commands
-- fixed role frontmatter parsing so valid roles can be discovered reliably
+- provides the `macOS / Linux` installer `install.sh`
+- provides the `Windows` installer `install.ps1`
+- provides `.cmd` launchers for Windows
+- installs or updates the `agency-agents-zh` dependency repository
+- includes `repo-install`, `repo-update`, and `doctor`
+- supports role search, preview, export, install, removal, and manifest sync
+
+---
+
+### Changelog
+
+Current version: `v0.2.0`
+
+Latest release highlights:
+
+- added the Windows installer `install.ps1` and `.cmd` launchers
+- added `repo-install`, `repo-update`, and `doctor`
+- added install and update flows for the `agency-agents-zh` dependency repository
+- fixed role frontmatter parsing and cross-platform launch behavior
+
+See [CHANGELOG.md](./CHANGELOG.md) for the full history.
 
 ---
 
@@ -237,7 +267,7 @@ Install for Codex:
 curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.sh | bash -s -- --tool codex
 ```
 
-Install and refresh the dependency repo:
+Install and update the dependency repository:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/dengqixing/agency-agents-zh-manage/main/install.sh | bash -s -- --tool codex --update-role-repo
@@ -250,13 +280,13 @@ Invoke-WebRequest https://raw.githubusercontent.com/dengqixing/agency-agents-zh-
 .\install.ps1 -Tool codex
 ```
 
-Install and refresh the dependency repo:
+Install and update the dependency repository:
 
 ```powershell
 .\install.ps1 -Tool codex -UpdateRoleRepo
 ```
 
-The Windows installer persists:
+After installation, the Windows installer persists:
 
 - `AGENCY_AGENTS_REPO`
 - `AGENCY_AGENTS_ZH_MANAGE_SCRIPT`
@@ -300,19 +330,19 @@ Windows:
 agency-agents-zh-manage.cmd --help
 ```
 
-Install the dependency repo:
+Install the dependency repository:
 
 ```bash
 "$SKILL_DIR/scripts/agency-agents-zh-manage.sh" repo-install
 ```
 
-Update the dependency repo:
+Update the dependency repository:
 
 ```bash
 "$SKILL_DIR/scripts/agency-agents-zh-manage.sh" repo-update
 ```
 
-Run environment diagnostics:
+Run diagnostics:
 
 ```bash
 "$SKILL_DIR/scripts/agency-agents-zh-manage.sh" doctor
@@ -330,7 +360,7 @@ Install a role into Codex:
 "$SKILL_DIR/scripts/agency-agents-zh-manage.sh" codex-install "software-architect" --scope user
 ```
 
-Sync a manifest:
+Sync from a manifest:
 
 ```bash
 "$SKILL_DIR/scripts/agency-agents-zh-manage.sh" sync --tool codex --manifest "./agents.txt" --scope user
@@ -338,7 +368,7 @@ Sync a manifest:
 
 ---
 
-### Dependency Repo Resolution
+### Dependency Repository Resolution
 
 The script resolves `agency-agents-zh` in this order:
 
@@ -350,7 +380,7 @@ The script resolves `agency-agents-zh` in this order:
 6. `~/.codex/vendor/agency-agents-zh`
 7. `~/.openclaw/vendor/agency-agents-zh`
 
-The default installer destination is:
+Default installation location:
 
 ```text
 ~/.agency/vendor/agency-agents-zh

@@ -1,7 +1,7 @@
 {
   "name": "agency-agents-zh-manage",
   "slug": "agency-agents-zh-manage",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Manage the agency-agents-zh role library on demand across macOS and Windows: find, preview, install, remove, sync, and maintain the dependency repo for Codex or OpenClaw.",
   "type": "skill",
   "entry": {
